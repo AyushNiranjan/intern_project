@@ -19,3 +19,9 @@ def get_lead_info(company: str = Query(...)):
         return result
     except Exception as e:
         return {"error": str(e)}
+import uvicorn
+import os
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+
