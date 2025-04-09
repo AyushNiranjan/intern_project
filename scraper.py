@@ -216,7 +216,7 @@ def get_lead_data(company):
         "description": description
     }
 
-# === CLI ENTRYPOINT ===
+# === CLI ENTRYPOINT (safe for Railway) ===
 def cli():
     company = input("Enter company name: ").strip()
     result = get_lead_data(company)
@@ -224,8 +224,11 @@ def cli():
     for key, value in result.items():
         print(f"{key}: {value}")
 
-# === MULTIPROCESSING SAFE ENTRYPOINT ===
+# === SAFE ENTRYPOINT ===
 if __name__ == "__main__":
+    import sys
     import multiprocessing
     multiprocessing.set_start_method("spawn", force=True)
-    cli()
+
+    if "cli" in sys.argv:
+        cli()
