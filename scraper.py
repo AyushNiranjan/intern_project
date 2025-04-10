@@ -13,11 +13,11 @@ import os
 # === CONFIG ===
 llm = ChatGroq(
     model_name="llama3-8b-8192",
-    groq_api_key=os.getenv("GROQ_API_KEY", "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")
+    groq_api_key=os.getenv("GROQ_API_KEY", "paste the api")
 )
 embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-serper_api_key = os.getenv("SERPER_API_KEY", "d5893ef70ad716f59de244976a281c24d4a89e2c")
-neverbounce_api_key = os.getenv("NEVERBOUNCE_API_KEY", "private_b29bbe907d639c538fc78f02f22a8b9a")
+serper_api_key = os.getenv("SERPER_API_KEY", "serper_api")
+neverbounce_api_key = os.getenv("NEVERBOUNCE_API_KEY", "neverbounce_api")
 SERPER_URL = "https://google.serper.dev/search"
 
 # === SEARCH GOOGLE ===
