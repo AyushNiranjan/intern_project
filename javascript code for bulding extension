@@ -1,0 +1,129 @@
+function installedOnEdit(e) {
+  if (!e) return;
+
+  const sheet = e.source.getActiveSheet();
+  const range = e.range;
+
+  // Only trigger on column A edits
+  if (range.getColumn() === 1 && range.getRow() > 1) {
+    const companyName = range.getValue();
+    const row = range.getRow();
+
+    // Clear previous results
+    sheet.getRange(row, 2, 1, 5).clearContent();
+    
+    // Create a debug cell
+    sheet.getRange(row, 7).setValue("Processing: " + companyName);
+    
+    // Update with your current working ngrok URL
+    const url =......;
+    
+    try {
+      sheet.getRange(row, 7).setValue(sheet.getRange(row, 7).getValue() + "\nFetching URL: " + url);
+      
+      // Browser-like user agent and headers with ngrok-skip-browser-warning
+      const options = {
+        muteHttpExceptions: true,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          'Cache-Control': 'no-cache',
+          'ngrok-skip-browser-warning': 'true'
+        }
+      };
+      
+      const response = UrlFetchApp.fetch(url, options);
+      const responseCode = response.getResponseCode();
+      const responseText = response.getContentText();
+      const contentType = response.getHeaders()['Content-Type'];
+      
+      sheet.getRange(row, 7).setValue(sheet.getRange(row, 7).getValue() + 
+                                     "\nResponse code: " + responseCode + 
+                                     "\nContent-Type: " + contentType +
+                                     "\nResponse starts with: " + responseText.substring(0, 30));
+      
+      try {
+        const data = JSON.parse(responseText);
+        
+        // Extract the first email from ceo_email array
+        let firstEmail = "N/A";
+        if (data.ceo_email && Array.isArray(data.ceo_email) && data.ceo_email.length > 0) {
+          firstEmail = data.ceo_email[0].email || "N/A";
+        }
+        
+      sheet.getRange(row, 2).setValue(data.ceo_name || "N/A"); // Column B
+      sheet.getRange(row, 3).setValue(firstEmail);             // Column C
+      sheet.getRange(row, 4).setValue(data.ceo_linkedin || "N/A"); // Column D
+      sheet.getRange(row, 5).setValue(data.company_linkedin || "N/A"); // Column E
+      sheet.getRange(row, 6).setValue(data.description || "N/A"); // Column F
+      sheet.getRange(row, 7).setValue("Success! ✅"); // Column G
+
+      } catch (parseErr) {
+        sheet.getRange(row, 2).setValue("Error parsing JSON response");
+        sheet.getRange(row, 7).setValue(sheet.getRange(row, 7).getValue() + 
+                                       "\nJSON Parse error: " + parseErr + 
+                                       "\nResponse: " + responseText.substring(0, 100));
+      }
+    } catch (err) {
+      sheet.getRange(row, 2).setValue("Error fetching data");
+      sheet.getRange(row, 7).setValue(sheet.getRange(row, 7).getValue() + 
+                                     "\nFetch error: " + err.toString());
+    }
+  }
+}
+
+function processResponse(response, sheet, dataRow, debugRow) {
+  const responseCode = response.getResponseCode();
+  const responseText = response.getContentText();
+  
+  sheet.getRange(debugRow, 8).setValue("Response code: " + responseCode);
+  sheet.getRange(debugRow+1, 8).setValue("Response (first 100 chars): " + responseText.substring(0, 100));
+  
+  if (responseCode >= 200 && responseCode < 300) {
+    try {
+      const data = JSON.parse(responseText);
+      
+      sheet.getRange(debugRow+2, 8).setValue("JSON parsed successfully");
+      
+      // Extract the first email
+      let firstEmail = "N/A";
+      if (data.ceo_email && Array.isArray(data.ceo_email) && data.ceo_email.length > 0) {
+        firstEmail = data.ceo_email[0].email || "N/A";
+      }
+      
+      // Write to Sheet
+      sheet.getRange(dataRow, 2).setValue(data.ceo_name || "N/A");
+      sheet.getRange(dataRow, 3).setValue(firstEmail);
+      sheet.getRange(dataRow, 4).setValue(data.ceo_linkedin || data.company_linkedin || "N/A");
+      sheet.getRange(dataRow, 5).setValue(data.description || "N/A");
+      
+      sheet.getRange(debugRow+3, 8).setValue("Data successfully written to row " + dataRow);
+    } catch (parseErr) {
+      sheet.getRange(debugRow+2, 8).setValue("JSON Parse error: " + parseErr);
+      sheet.getRange(dataRow, 2).setValue("Error parsing JSON response");
+    }
+  } else {
+    sheet.getRange(debugRow+2, 8).setValue("API error: " + responseCode);
+    sheet.getRange(dataRow, 2).setValue("API error: " + responseCode);
+  }
+}
+
+// This function will set up the installable trigger
+function createEditTrigger() {
+  // Delete existing triggers to avoid duplicates
+  const triggers = ScriptApp.getProjectTriggers();
+  for (let i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'installedOnEdit') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  
+  // Create new trigger
+  ScriptApp.newTrigger('installedOnEdit')
+    .forSpreadsheet(SpreadsheetApp.getActive())
+    .onEdit()
+    .create();
+    
+  Logger.log('Edit trigger created successfully');
+}
