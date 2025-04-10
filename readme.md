@@ -1,49 +1,44 @@
 # 🚀 AI-Powered Lead Generation & CEO Email Finder Tool
 
-An end-to-end AI-powered scraping tool that extracts **CEO name, emails, company description, and LinkedIn profiles** for any company entered in a **Google Sheet**.
+An end-to-end AI-powered scraping system that extracts **CEO names, emails, company descriptions, and LinkedIn profiles** for any company entered in a **Google Sheet**.
 
-This tool combines:
-- **LLMs (Groq + LLaMA-3)** for CEO name reasoning
-- **Web scraping + search results**
-- **Email generation & validation**
-- **FastAPI backend**
-- **Google Sheets Apps Script** for a smooth frontend UX
+This tool merges the power of **LLMs (Groq + LLaMA-3)**, **search APIs**, **web scraping**, and **email verification** into a single pipeline. Ideal for B2B marketers, startup founders, VCs, and recruiters.
 
 ---
 
-## 📊 Use Case
+## 📊 Use Cases
 
 This project is designed for:
-- B2B marketers doing outreach
-- Founders/VCs doing market scans
-- Lead generation analysts
-- Anyone trying to find accurate **decision-maker info** fast
+- 🔍 **B2B marketers** doing outreach campaigns
+- 💼 **Founders or VCs** doing competitive research
+- 📈 **Lead generation teams** needing clean decision-maker data
+- 🤖 Anyone tired of expensive tools like ZoomInfo or Apollo
 
 ---
 
-## 🧠 How It Works (Architecture)
+## 🧠 Architecture Overview
 
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer       | Tech                             |
-|------------|----------------------------------|
-| 🔍 Search   | [Serper.dev](https://serper.dev) |
-| 🧠 LLM      | LLaMA-3 via [Groq](https://console.groq.com) |
-| 📚 RAG      | LangChain + FAISS                |
-| 🔎 Scraping | BeautifulSoup + requests         |
-| 📬 Email    | NeverBounce                      |
-| 🌐 Backend  | FastAPI                          |
-| 📄 Frontend | Google Sheets + Apps Script      |
-| 🚀 Hosting  | Ngrok                            |
+| Layer       | Tech                             | Purpose                                       |
+|------------|----------------------------------|-----------------------------------------------|
+| 🔍 Search   | [Serper.dev](https://serper.dev) | Google Search API for top results             |
+| 🧠 LLM      | LLaMA-3 via [Groq](https://console.groq.com) | Reasoning to identify the CEO                |
+| 📚 RAG      | LangChain + FAISS                | Contextual understanding for CEO name         |
+| 🔎 Scraping | BeautifulSoup + requests         | Extract LinkedIn, About, Titles, etc.         |
+| 📬 Email    | Email Pattern Generator + [NeverBounce](https://neverbounce.com) | Verify deliverable emails                    |
+| 🌐 Backend  | FastAPI                          | API endpoint for communication with Sheets    |
+| 📄 Frontend | Google Sheets + Apps Script      | Easy-to-use frontend for non-technical users  |
+| 🚀 Hosting  | Ngrok (dev) / Render (prod)      | Tunnels or deploys backend                    |
 
 ---
 
-## 🔑 API Keys Setup
+## 🔐 Environment Setup
 
-Create a `.env` file at the root of the project:
+Create a `.env` file in the root directory:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
